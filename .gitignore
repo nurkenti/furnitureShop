@@ -1,0 +1,18 @@
+# Файлы в Go
+bin/
+dish/
+*.exe
+*.test
+
+# Модули Go 
+vandor/
+
+#IDE 
+.idea/
+.vscode/
+*.swp/
+*.swo
+
+# Системные
+.DS_Store
+
