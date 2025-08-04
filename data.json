@@ -1,0 +1,24 @@
+{
+  "395": {
+    "type": "chair",
+    "data": {
+      "id": 395,
+      "model": "Sonyx",
+      "in_stock": 1422,
+      "price": 10000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "628": {
+    "type": "chair",
+    "data": {
+      "id": 628,
+      "model": "Sonyx",
+      "in_stock": 1,
+      "price": 20000,
+      "material": "metal",
+      "type": "chair"
+    }
+  }
+}

@@ -6,30 +6,33 @@ import (
 	"log"
 )
 
-func (s *Storage) Sell(id int, quantity int) (warehouse.Chair, error) {
+func (s *Storage) Sell(id int, quantity int) (warehouse.Product, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if quantity <= 0 {
-		return warehouse.Chair{}, fmt.Errorf("invalid quantity: must be positive, got %d", quantity)
+		return nil, fmt.Errorf("invalid quantity: must be positive, got %d", quantity)
 	}
 
-	chair, exists := s.chairs[id]
+	product, exists := s.products[id]
 	if !exists {
-		return warehouse.Chair{}, fmt.Errorf("chair with ID %d not found", id)
+		return nil, fmt.Errorf("product with ID %d not found", id)
 	}
 
-	if chair.InStock < quantity {
-		return warehouse.Chair{}, fmt.Errorf("not enough chairs in stock (requested: %d, available: %d)", quantity, chair.InStock)
+	productCopy := product.Clone()
+
+	if err := product.ReduceStock(quantity); err != nil {
+		return nil, fmt.Errorf("sale failed: %w", err)
 	}
-
-	chair.InStock -= quantity
-	s.chairs[id] = chair
-
 	if err := s.save(); err != nil {
-		return warehouse.Chair{}, fmt.Errorf("failed to save inventory: %w", err)
+		product.ReduceStock(-quantity)
+		return nil, fmt.Errorf("failed to save inventory: %w", err)
 	}
+	log.Printf("[УСПЕШНАЯ ПРОДАЖА] ID товара: %d, Модель: %s, Продано: %d, Остаток: %d",
+		id,
+		product.GetModel(),
+		quantity,
+		product.GetInStock())
 
-	log.Printf("[SALE] chair_id=%d quantity=%d new_stock=%d", id, quantity, chair.InStock)
-	return chair, nil
+	return productCopy, nil
 }

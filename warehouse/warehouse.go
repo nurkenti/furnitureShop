@@ -1,29 +1,70 @@
 package warehouse
 
+import "fmt"
+
+type Product interface {
+	GetID() int
+	GetModel() string
+	GetInStock() int
+	GetPrice() int
+	ReduceStock(quantity int) error
+	Clone() Product
+}
+
+type BaseProduct struct {
+	ID      int    `json:"id"`
+	Model   string `json:"model"`
+	InStock int    `json:"in_stock"`
+	Price   int    `json:"price"`
+	
+}
+
+func (bp *BaseProduct) ReduceStock(quantity int) error {
+	if bp.InStock < quantity {
+		return fmt.Errorf("not enough stock")
+	}
+	bp.InStock -= quantity
+	return nil
+}
+func (bp *BaseProduct) Clone() Product {
+	return &BaseProduct{
+		ID:      bp.ID,
+		Model:   bp.Model,
+		Price:   bp.Price,
+		InStock: bp.InStock,
+	}
+
+}
+
+func (bp BaseProduct) GetID() int {
+	return bp.ID
+}
+func (bp BaseProduct) GetModel() string {
+	return bp.Model
+	//Sonyx, Kurumi - chair
+	//Unibi, Facito - wardrobe
+}
+func (bp BaseProduct) GetInStock() int {
+	return bp.InStock
+}
+func (bp BaseProduct) GetPrice() int {
+	return bp.Price
+}
+
 type Chair struct {
-	Id       int    `json: "id"`   //01
-	Name     string `json: "name"` //Sonyx, Kurumi
-	Material string `json: "material"`
-	InStock  int    `json:"in_stoke"`
-	Price    int    `price`
+	BaseProduct
+	Material string `json:"material"`
+	Type     string `json:"type"`
 }
 
 type Wardrobe struct { //шкаф
-	Id       int    `json: "id"`   //02
-	Name     string `json: "name"` //Unibi, Facito
-	Material string `json: "material"`
-	InStoke  int    `json: "in_stock"`
-	Price    int    `price`
+	BaseProduct
+	Material string `json:"material"`
+	Type     string `json:"type"`
 }
 
 type Conditioner struct {
-	Id      int `json: "id"` //03
-	Price   int `price`
-	InStoke int `json: "in_stock"`
-}
-type Store struct {
-	Chairs       *Chair
-	Wardrobes    *Wardrobe
-	Conditioners *Conditioner
-	TotalSales   int
+	BaseProduct
+	Version string `json:"version"`
+	Type    string `json:"type"`
 }

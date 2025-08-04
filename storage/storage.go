@@ -16,63 +16,126 @@ var (
 )
 
 type Storage struct {
-	chairs map[int]warehouse.Chair
-	mu     sync.Mutex
-	file   string
+	products map[int]warehouse.Product
+	mu       sync.RWMutex
+	file     string
 }
 
 func NewStorage(file string) *Storage {
 	return &Storage{
-		chairs: make(map[int]warehouse.Chair),
-		file:   file,
+		products: make(map[int]warehouse.Product),
+		file:     file,
 	}
 }
 
-func (s *Storage) AddChair(chair warehouse.Chair) error {
+func (s *Storage) AddProduct(product warehouse.Product) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if _, exist := s.chairs[chair.Id]; exist {
-		return errors.New("cтул с таким id уже существует")
-	}
+	if _, exist := s.products[product.GetID()]; exist {
+		return errors.New("Товар с таким id уже существует")
+	} // exist мы проверям наличие ключа в map
 
-	s.chairs[chair.Id] = chair
-	if err := s.save(); err != nil {
-		return fmt.Errorf("Не удалось добавить данные %v", err)
-	}
-	fmt.Printf("✅ Стул добавлен: %+v\n", chair)
-	return nil
+	s.products[product.GetID()] = product // вызывает метод save и он возвращает ошибку. Если ошибка не нил  то хана
+	fmt.Printf("✅ Товар добавлен: %+v\n", product)
+	return s.save()
 
 }
-
-func (s *Storage) DelChair(id int) error {
+func (s *Storage) DelProduct(id int) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, exist := s.chairs[id]; !exist {
+	if _, exist := s.products[id]; !exist {
 		return fmt.Errorf("Товар %d не существует", id)
 	}
 
-	delete(s.chairs, id)
+	delete(s.products, id)
 
 	if err := s.save(); err != nil {
 		return fmt.Errorf("Ошибка при сохранений данных: %v", err)
 	}
-	fmt.Printf("🗑️ Стул с ID %d успешно удален\n", id)
+	fmt.Printf("🗑️ Товар с ID %d успешно удален\n", id)
 	return nil
 }
 
 func (s *Storage) save() error {
-	data, err := json.Marshal(s.chairs)
-	if err != nil {
-		return nil
+	type productSave struct {
+		Type string            `json:"type"`
+		Data warehouse.Product `json:"data"`
 	}
-	return os.WriteFile(s.file, data, 0644)
-}
 
+	toSave := make(map[int]productSave)
+	for id, p := range s.products {
+		// Определяем тип товара
+		var typeStr string
+		switch p.(type) {
+		case *warehouse.Chair:
+			typeStr = "chair"
+		case *warehouse.Wardrobe:
+			typeStr = "wardrobe"
+		case *warehouse.Conditioner:
+			typeStr = "conditioner"
+		default:
+			return fmt.Errorf("неизвестный тип товара при сохранении: %T", p)
+		}
+		toSave[id] = productSave{
+			Type: typeStr,
+			Data: p,
+		}
+	}
+
+	file, err := os.Create(s.file)
+	if err != nil {
+		return fmt.Errorf("ошибка создания файла: %w", err)
+	}
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	return encoder.Encode(toSave)
+}
 func (s *Storage) Load() error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	data, err := os.ReadFile(s.file)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil // Файла нет - это не ошибка
+		}
 		return err
 	}
-	return json.Unmarshal(data, &s.chairs)
+
+	if len(data) == 0 {
+		return nil // Пустой файл - не ошибка
+	}
+
+	type productLoad struct {
+		Type string          `json:"type"`
+		Data json.RawMessage `json:"data"`
+	}
+
+	var loaded map[int]productLoad
+	if err := json.Unmarshal(data, &loaded); err != nil {
+		return fmt.Errorf("ошибка с разборам файла %w", err)
+	}
+	s.products = make(map[int]warehouse.Product)
+	for id, item := range loaded {
+		var p warehouse.Product
+
+		switch item.Type {
+		case "chair":
+			p = &warehouse.Chair{}
+		case "wardrobe":
+			p = &warehouse.Wardrobe{}
+		case "conditioner":
+			p = &warehouse.Conditioner{}
+		default:
+			return fmt.Errorf("неизвестный тип товара при загрузке: %s", item.Type)
+		}
+		if err := json.Unmarshal(item.Data, p); err != nil {
+			return fmt.Errorf("ошибка разбора товара %d: %w", id, err)
+		}
+		s.products[id] = p
+	}
+
+	return nil
 }
