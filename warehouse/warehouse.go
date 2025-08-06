@@ -16,7 +16,6 @@ type BaseProduct struct {
 	Model   string `json:"model"`
 	InStock int    `json:"in_stock"`
 	Price   int    `json:"price"`
-	
 }
 
 func (bp *BaseProduct) ReduceStock(quantity int) error {

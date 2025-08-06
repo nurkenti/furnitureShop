@@ -3,6 +3,7 @@ package menu
 import (
 	"bufio"
 	"fmt"
+	"github/kaiiiman/chairStore/cash"
 	"github/kaiiiman/chairStore/storage"
 	"github/kaiiiman/chairStore/warehouse"
 	"log"
@@ -12,6 +13,8 @@ import (
 	"strings"
 	"time"
 )
+
+var wallet = cash.MyBank(1000000)
 
 func Salesman1() {
 	fmt.Println("Вы выбрали роль Продовца), Ваша задача прибрести товар и продать их покупателям")
@@ -26,7 +29,7 @@ func Doing() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		prompt := "Выберите действие: "
-		menuItems := []string{"Купить товар", "Поиск", "Удалить товар", "Продать товар", "Выход"}
+		menuItems := []string{"Купить товар", "Поиск", "Удалить товар", "Продать товар", "Выход", "Баланс"}
 		u := &UserInput{}
 
 		CreatMenu(prompt, menuItems, u)
@@ -34,16 +37,20 @@ func Doing() {
 
 		switch u.option.ID {
 		case 0:
-			BuyChair()
+			BuyProduct()
 		case 1:
 			LoadStorage("Чтобы найти товар напишите модель: ")
 		case 2:
 			DelProductM()
 		case 3:
-			SellChair()
+			SellProduct()
 		case 4:
 			Timeloading(1, "Завершить работу...")
 			return
+		case 5:
+			fmt.Printf("Ваш счет в Банке: %d\n \n", wallet)
+			Timeloading(4, "...")
+			continue
 		}
 		Timeloading(1, "")
 		fmt.Println("")
@@ -108,7 +115,7 @@ func LoadStorage(s string) {
 	}
 }
 
-func BuyChair() {
+func BuyProduct() {
 	// Тут у меня загрузил склад
 	db := storage.NewStorage("data.json")
 	if err := db.Load(); err != nil {
@@ -133,13 +140,12 @@ func BuyChair() {
 		addConditioner(db)
 
 	}
-	fmt.Println("Товар успешно добавлен и сохранен!")
 }
-func addChair(db *storage.Storage) {
+func addChair(db *storage.Storage) error {
 	i := ID()
 	m := Model("Sonyx", "Kurumi")
 	ma := Material("wood", "metal", "plastic")
-	pr := Price("5000", "10000", "20000")
+	pr := Price(5000, 10000, 20000)
 	in := Instock("стульев")
 	chair := &warehouse.Chair{
 		BaseProduct: warehouse.BaseProduct{
@@ -151,17 +157,48 @@ func addChair(db *storage.Storage) {
 		Material: ma,
 		Type:     "chair",
 	}
+	PriseStock := pr * in
+	err := CashSell(PriseStock)
+	if err != nil {
+		return err
+	}
 	Timeloading(3, "Идет процесс покупки...")
 	if err := db.AddProduct(chair); err != nil {
 		log.Fatal("Ошибка добавление товара", err)
 	}
+
+	Timeloading(3, "Товар успешно добавлен и сохранен!")
+	return nil
 }
 
-func addWardrobe(db *storage.Storage) {
+// Денежные итераций
+func CashSell(ps int) error {
+	Timeloading(2, "...")
+	err := wallet.SellMoney(ps)
+	Timeloading(2, "...")
+	if err != nil {
+		fmt.Printf("У вас не достаточно денег! \n Товар: %d\n На счету: %d\n", ps, wallet)
+		Timeloading(4, "")
+		return err
+	}
+	return nil
+}
+func CashBuy(ps int) error {
+	fmt.Printf("У вас на счету: %d\n", wallet)
+	Timeloading(2, "...")
+	err := wallet.AddMoney(ps)
+	if err != nil {
+		fmt.Printf("У вас не достаточно денег.\n Товар: %d\n На счету: %d", ps, wallet)
+		return err
+	}
+	return nil
+}
+
+func addWardrobe(db *storage.Storage) error {
 	i := ID()
 	m := Model("Unibi", "Facito")
 	mat := Material("wood", "metal", "bamboo")
-	p := Price("20000", "50000", "100000")
+	p := Price(20000, 50000, 100000)
 	in := Instock("шкафа")
 	wardrobe := &warehouse.Wardrobe{
 		BaseProduct: warehouse.BaseProduct{
@@ -174,16 +211,26 @@ func addWardrobe(db *storage.Storage) {
 		Material: mat,
 		Type:     "wardrobe",
 	}
+	PriseStock := p * in
+
+	err := CashSell(PriseStock)
+	if err != nil {
+		return err
+	}
+
 	Timeloading(3, "Идет процесс покупки...")
 	if err := db.AddProduct(wardrobe); err != nil {
 		log.Fatal("Ошибка добавление товара", err)
 	}
+
+	Timeloading(3, "Товар успешно добавлен и сохранен!")
+	return nil
 }
-func addConditioner(db *storage.Storage) {
+func addConditioner(db *storage.Storage) error {
 	i := ID()
 	m := Model("Xpx", "Faca")
 	mat := Version()
-	p := Price("40000", "150000", "620000")
+	p := Price(40000, 150000, 620000)
 	in := Instock("кондиционеров")
 	conditioner := &warehouse.Conditioner{
 		BaseProduct: warehouse.BaseProduct{
@@ -195,10 +242,19 @@ func addConditioner(db *storage.Storage) {
 		Version: mat,
 		Type:    "conditioner",
 	}
+	PriseStock := p * in
+
+	err := CashSell(PriseStock)
+	if err != nil {
+		return err
+	}
+
 	Timeloading(3, "Идет процесс покупки...")
 	if err := db.AddProduct(conditioner); err != nil {
 		log.Fatal("Ошибка добавление товара", err)
 	}
+	Timeloading(3, "Товар успешно добавлен и сохранен!")
+	return nil
 }
 
 func ID() int {
@@ -215,11 +271,15 @@ func Model(a, b string) string {
 	return uModel.option.Text
 }
 
-func Price(a, b, c string) int {
+func Price(a, b, c int) int {
 	promptPrice := "Прайс: "
-	menuItemsPrice := []string{a, b, c}
+	menuItemsPrice := []int{a, b, c}
+	var priceOptions []string
+	for _, price := range menuItemsPrice {
+		priceOptions = append(priceOptions, fmt.Sprint(price))
+	}
 	uPrice := &UserInput{}
-	CreatMenu(promptPrice, menuItemsPrice, uPrice)
+	CreatMenu(promptPrice, priceOptions, uPrice)
 	fmt.Println("Вы выбрали:", uPrice.option.Text)
 	num, err := strconv.Atoi(uPrice.option.Text)
 	if err != nil {
@@ -284,7 +344,7 @@ func DelProductM() {
 	fmt.Println("Товар успешно удален")
 }
 
-func SellChair() {
+func SellProduct() {
 	db := storage.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Println("Не удалось загрузить данные", err)
@@ -305,12 +365,13 @@ func SellChair() {
 	}
 	Timeloading(4, "Обработка покупки...")
 
-	soldChair, err := db.Sell(idr, instock)
+	soldProduct, err := db.Sell(idr, instock)
 	if err != nil {
 		log.Fatal("Ошибка продажи ", err)
 	}
-	fmt.Printf("💰 Продано %d стульев модели '%s'\n", 3, soldChair.GetModel())
-	fmt.Printf("📊 Остаток на складе: %d\n", soldChair.GetInStock())
+	ds := soldProduct.GetPrice() * instock
+	wallet.AddMoney(ds)
+	Timeloading(2, "")
 }
 
 func Timeloading(n time.Duration, s string) {

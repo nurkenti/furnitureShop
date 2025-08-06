@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func toInt(val interface{}) (int, error) {
+func ToInt(val interface{}) (int, error) {
 	switch v := val.(type) {
 	case int:
 		return v, nil

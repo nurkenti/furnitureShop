@@ -28,7 +28,7 @@ func (s *Storage) Sell(id int, quantity int) (warehouse.Product, error) {
 		product.ReduceStock(-quantity)
 		return nil, fmt.Errorf("failed to save inventory: %w", err)
 	}
-	log.Printf("[УСПЕШНАЯ ПРОДАЖА] ID товара: %d, Модель: %s, Продано: %d, Остаток: %d",
+	log.Printf("\n💰 Продано ID товара: %d, Модель: %s, Продано: %d, Остаток: %d",
 		id,
 		product.GetModel(),
 		quantity,
