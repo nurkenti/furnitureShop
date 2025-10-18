@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github/kaiiiman/chairStore/warehouse"
 	"os"
 	"sync"
+
+	"github.com/nurkenti/furnitureShop/warehouse"
 )
 
 // А это база данных которые мы сохроняем все товары

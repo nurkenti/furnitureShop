@@ -2,8 +2,9 @@ package storage
 
 import (
 	"errors"
-	"github/kaiiiman/chairStore/warehouse"
 	"strings"
+
+	"github.com/nurkenti/furnitureShop/warehouse"
 )
 
 // Тут мы делаем поиск товаров
@@ -61,67 +62,3 @@ func matchesFilter(product warehouse.Product, filters map[string]interface{}) bo
 	}
 	return true
 }
-
-// 	for _, product := range s.products {
-// 		match := true
-// 		// смотрим только значение map продукта
-
-// 		if modelFilter, ok := filters["model"]; ok && match {
-// 			if model, ok := modelFilter.(string); ok {
-// 				if !strings.Contains(
-// 					strings.ToLower(product.GetModel()),
-// 					strings.ToLower(model),
-// 				) {
-// 					match = false
-// 				}
-// 			}
-// 		}
-// 		if minPriceFilter, ok := filters["price"]; ok && match {
-// 			if minPrice, err := toInt(minPriceFilter); err != nil {
-// 				if product.GetPrice() < minPrice {
-// 					match = false
-// 				}
-// 			}
-// 		}
-// 		if minStockFilter, ok := filters["in_stock"]; ok && match {
-// 			if minStock, err := toInt(minStockFilter); err != nil {
-// 				if product.GetInStock() < minStock {
-// 					match = false
-// 				}
-// 			}
-// 		}
-// 		if _, ok := filters["type"]; ok && match {
-// 			switch p := product.(type) {
-// 			case *warehouse.Chair:
-// 				if material, ok := filters["material"]; ok {
-// 					if m, ok := material.(string); ok {
-// 						if !strings.EqualFold(p.Material, m) {
-// 							match = false
-// 						}
-// 					}
-
-//					}
-//				case *warehouse.Wardrobe:
-//					if material, ok := filters["material"]; ok {
-//						if m, ok := material.(string); ok {
-//							if !strings.EqualFold(p.Material, m) {
-//								match = false
-//							}
-//						}
-//					}
-//				case *warehouse.Conditioner:
-//					if version, ok := filters["version"]; ok {
-//						if v, ok := version.(string); ok {
-//							if !strings.EqualFold(p.Version, v) {
-//								match = false
-//							}
-//						}
-//					}
-//				}
-//			}
-//			if match {
-//				result = append(result, product)
-//			}
-//		}
-//		return result, nil
-//	}

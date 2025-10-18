@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github/kaiiiman/chairStore/menu"
+	"github.com/nurkenti/furnitureShop/menu"
 )
 
 func main() {

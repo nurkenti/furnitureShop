@@ -1,4 +1,4 @@
-module github/kaiiiman/chairStore
+module github.com/nurkenti/furnitureShop
 
 go 1.24.2
 

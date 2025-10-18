@@ -307,6 +307,17 @@
       "type": "chair"
     }
   },
+  "857": {
+    "type": "chair",
+    "data": {
+      "id": 857,
+      "model": "Kurumi",
+      "in_stock": 15,
+      "price": 10000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
   "858": {
     "type": "chair",
     "data": {

@@ -2,8 +2,9 @@ package storage
 
 import (
 	"fmt"
-	"github/kaiiiman/chairStore/warehouse"
 	"log"
+
+	"github.com/nurkenti/furnitureShop/warehouse"
 )
 
 func (s *Storage) Sell(id int, quantity int) (warehouse.Product, error) {

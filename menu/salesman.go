@@ -3,15 +3,16 @@ package menu
 import (
 	"bufio"
 	"fmt"
-	"github/kaiiiman/chairStore/cash"
-	"github/kaiiiman/chairStore/storage"
-	"github/kaiiiman/chairStore/warehouse"
 	"log"
 	"math/rand"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/nurkenti/furnitureShop/cash"
+	"github.com/nurkenti/furnitureShop/storage"
+	"github.com/nurkenti/furnitureShop/warehouse"
 )
 
 var wallet = cash.MyBank(1000000)
@@ -175,7 +176,7 @@ func addChair(db *storage.Storage) error {
 func CashSell(ps int) error {
 	Timeloading(2, "...")
 	err := wallet.SellMoney(ps)
-	Timeloading(2, "...")
+	Timeloading(2, "")
 	if err != nil {
 		fmt.Printf("У вас не достаточно денег! \n Товар: %d\n На счету: %d\n", ps, wallet)
 		Timeloading(4, "")

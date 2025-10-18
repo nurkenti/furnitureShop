@@ -3,7 +3,8 @@ package storage
 import (
 	"encoding/json"
 	"fmt"
-	"github/kaiiiman/chairStore/warehouse"
+
+	"github.com/nurkenti/furnitureShop/warehouse"
 )
 
 func (s *Storage) UnmarshalJSON(data []byte) error {
