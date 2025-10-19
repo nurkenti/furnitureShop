@@ -1,4 +1,4 @@
-package cash
+package service
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package storage
+package service
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/nurkenti/furnitureShop/warehouse"
+	"github.com/nurkenti/furnitureShop/internal/domain"
 )
 
 // А это база данных которые мы сохроняем все товары
@@ -17,19 +17,19 @@ var (
 )
 
 type Storage struct {
-	products map[int]warehouse.Product
+	products map[int]domain.Product
 	mu       sync.RWMutex
 	file     string
 }
 
 func NewStorage(file string) *Storage {
 	return &Storage{
-		products: make(map[int]warehouse.Product),
+		products: make(map[int]domain.Product),
 		file:     file,
 	}
 }
 
-func (s *Storage) AddProduct(product warehouse.Product) error {
+func (s *Storage) AddProduct(product domain.Product) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -60,8 +60,8 @@ func (s *Storage) DelProduct(id int) error {
 
 func (s *Storage) save() error {
 	type productSave struct {
-		Type string            `json:"type"`
-		Data warehouse.Product `json:"data"`
+		Type string         `json:"type"`
+		Data domain.Product `json:"data"`
 	}
 
 	toSave := make(map[int]productSave)
@@ -69,11 +69,11 @@ func (s *Storage) save() error {
 		// Определяем тип товара
 		var typeStr string
 		switch p.(type) {
-		case *warehouse.Chair:
+		case *domain.Chair:
 			typeStr = "chair"
-		case *warehouse.Wardrobe:
+		case *domain.Wardrobe:
 			typeStr = "wardrobe"
-		case *warehouse.Conditioner:
+		case *domain.Conditioner:
 			typeStr = "conditioner"
 		default:
 			return fmt.Errorf("неизвестный тип товара при сохранении: %T", p)
@@ -118,17 +118,17 @@ func (s *Storage) Load() error {
 	if err := json.Unmarshal(data, &loaded); err != nil {
 		return fmt.Errorf("ошибка с разборам файла %w", err)
 	}
-	s.products = make(map[int]warehouse.Product)
+	s.products = make(map[int]domain.Product)
 	for id, item := range loaded {
-		var p warehouse.Product
+		var p domain.Product
 
 		switch item.Type {
 		case "chair":
-			p = &warehouse.Chair{}
+			p = &domain.Chair{}
 		case "wardrobe":
-			p = &warehouse.Wardrobe{}
+			p = &domain.Wardrobe{}
 		case "conditioner":
-			p = &warehouse.Conditioner{}
+			p = &domain.Conditioner{}
 		default:
 			return fmt.Errorf("неизвестный тип товара при загрузке: %s", item.Type)
 		}

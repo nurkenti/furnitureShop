@@ -208,17 +208,6 @@
       "type": "chair"
     }
   },
-  "627": {
-    "type": "chair",
-    "data": {
-      "id": 627,
-      "model": "Sonyx",
-      "in_stock": 100,
-      "price": 20000,
-      "material": "wood",
-      "type": "chair"
-    }
-  },
   "640": {
     "type": "chair",
     "data": {

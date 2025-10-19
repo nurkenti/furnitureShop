@@ -10,12 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nurkenti/furnitureShop/cash"
-	"github.com/nurkenti/furnitureShop/storage"
-	"github.com/nurkenti/furnitureShop/warehouse"
+	"github.com/nurkenti/furnitureShop/internal/domain"
+	"github.com/nurkenti/furnitureShop/internal/service"
 )
 
-var wallet = cash.MyBank(1000000)
+var wallet = service.MyBank(1000000)
 
 func Salesman1() {
 	fmt.Println("Вы выбрали роль Продовца), Ваша задача прибрести товар и продать их покупателям")
@@ -52,6 +51,9 @@ func Doing() {
 			fmt.Printf("Ваш счет в Банке: %d\n \n", wallet)
 			Timeloading(4, "...")
 			continue
+		default:
+			fmt.Println("Выберите из 5 пунктов")
+			return
 		}
 		Timeloading(1, "")
 		fmt.Println("")
@@ -61,17 +63,10 @@ func Doing() {
 }
 
 func LoadStorage(s string) {
-	db := storage.NewStorage("data.json")
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Fatal("Не удалось загрузить данные", err)
 	}
-
-	// fmt.Println(s)
-	// var modelAns string
-	// _, err := fmt.Scan(&modelAns)
-	// if err != nil {
-	// 	log.Fatal("Ошибка! Надо написать", err)
-	// }
 
 	var typeAns string
 	fmt.Print("Напишите тип товара :")
@@ -118,7 +113,7 @@ func LoadStorage(s string) {
 
 func BuyProduct() {
 	// Тут у меня загрузил склад
-	db := storage.NewStorage("data.json")
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Fatal("Не удалось загрузить данные", err)
 	}
@@ -142,14 +137,14 @@ func BuyProduct() {
 
 	}
 }
-func addChair(db *storage.Storage) error {
+func addChair(db *service.Storage) error {
 	i := ID()
 	m := Model("Sonyx", "Kurumi")
 	ma := Material("wood", "metal", "plastic")
 	pr := Price(5000, 10000, 20000)
 	in := Instock("стульев")
-	chair := &warehouse.Chair{
-		BaseProduct: warehouse.BaseProduct{
+	chair := &domain.Chair{
+		BaseProduct: domain.BaseProduct{
 			ID:      i,
 			Model:   m,
 			Price:   pr,
@@ -195,14 +190,14 @@ func CashBuy(ps int) error {
 	return nil
 }
 
-func addWardrobe(db *storage.Storage) error {
+func addWardrobe(db *service.Storage) error {
 	i := ID()
 	m := Model("Unibi", "Facito")
 	mat := Material("wood", "metal", "bamboo")
 	p := Price(20000, 50000, 100000)
 	in := Instock("шкафа")
-	wardrobe := &warehouse.Wardrobe{
-		BaseProduct: warehouse.BaseProduct{
+	wardrobe := &domain.Wardrobe{
+		BaseProduct: domain.BaseProduct{
 			ID:    i,
 			Model: m,
 
@@ -227,14 +222,14 @@ func addWardrobe(db *storage.Storage) error {
 	Timeloading(3, "Товар успешно добавлен и сохранен!")
 	return nil
 }
-func addConditioner(db *storage.Storage) error {
+func addConditioner(db *service.Storage) error {
 	i := ID()
 	m := Model("Xpx", "Faca")
 	mat := Version()
 	p := Price(40000, 150000, 620000)
 	in := Instock("кондиционеров")
-	conditioner := &warehouse.Conditioner{
-		BaseProduct: warehouse.BaseProduct{
+	conditioner := &domain.Conditioner{
+		BaseProduct: domain.BaseProduct{
 			ID:      i,
 			Model:   m,
 			Price:   p,
@@ -317,7 +312,7 @@ func Instock(a string) int {
 }
 
 func DelProductM() {
-	db := storage.NewStorage("data.json")
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Println("Не удалось загрузить данные", err)
 	}
@@ -346,7 +341,7 @@ func DelProductM() {
 }
 
 func SellProduct() {
-	db := storage.NewStorage("data.json")
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Println("Не удалось загрузить данные", err)
 	}

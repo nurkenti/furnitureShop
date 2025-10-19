@@ -1,10 +1,10 @@
-package storage
+package service
 
 import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/nurkenti/furnitureShop/warehouse"
+	"github.com/nurkenti/furnitureShop/internal/domain"
 )
 
 func (s *Storage) UnmarshalJSON(data []byte) error {
@@ -21,23 +21,23 @@ func (s *Storage) UnmarshalJSON(data []byte) error {
 
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.products = make(map[int]warehouse.Product)
+	s.products = make(map[int]domain.Product)
 
 	for id, p := range temp {
-		var product warehouse.Product
+		var product domain.Product
 		var err error
 
 		switch p.Type {
 		case "chair":
-			var chair warehouse.Chair
+			var chair domain.Chair
 			err = json.Unmarshal(p.Data, &chair)
 			product = &chair
 		case "wardrobe":
-			var wardrobe warehouse.Wardrobe
+			var wardrobe domain.Wardrobe
 			err = json.Unmarshal(p.Data, &wardrobe)
 			product = &wardrobe
 		case "conditioner":
-			var cond warehouse.Conditioner
+			var cond domain.Conditioner
 			err = json.Unmarshal(p.Data, &cond)
 			product = &cond
 		default:

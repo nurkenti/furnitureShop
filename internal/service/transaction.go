@@ -1,13 +1,13 @@
-package storage
+package service
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/nurkenti/furnitureShop/warehouse"
+	"github.com/nurkenti/furnitureShop/internal/domain"
 )
 
-func (s *Storage) Sell(id int, quantity int) (warehouse.Product, error) {
+func (s *Storage) Sell(id int, quantity int) (domain.Product, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
