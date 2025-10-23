@@ -1,4 +1,4 @@
-package db
+package util
 
 import (
 	"math/rand"
@@ -25,9 +25,6 @@ func RandomString(n int) string {
 	return sb.String()
 }
 
-func RandomID() int {
-	return RandomInt(200)
-}
 func RandomPassword() string {
 	number := RandomInt(80)
 	p := strconv.Itoa(number)
@@ -44,7 +41,7 @@ func RandomName() string {
 }
 
 func RandomAge() int {
-	return RandomInt(2)
+	return rand.Intn(99)
 }
 
 func RandomRole() string {

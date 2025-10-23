@@ -3,8 +3,10 @@ package sqlc
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/nurkenti/furnitureShop/db/util"
 	"github.com/stretchr/testify/require"
@@ -38,4 +40,50 @@ func createRandomUser(t *testing.T) User {
 
 func TestCreatUser(t *testing.T) {
 	createRandomUser(t)
+}
+
+func TestGetUserByEmail(t *testing.T) {
+	user1 := createRandomUser(t)
+	user2, err := testQueries.GetUserByEmail(context.Background(), user1.Email)
+	require.NoError(t, err)
+	require.NotEmpty(t, user2)
+
+	require.Equal(t, user1.ID, user2.ID)
+	require.Equal(t, user1.Email, user2.Email)
+	require.WithinDuration(t, user1.CreatedAt.Time, user2.CreatedAt.Time, time.Second)
+}
+
+func TestUpdateUser(t *testing.T) {
+	user1 := createRandomUser(t)
+
+	arg := UpdateUserParams{
+		ID:       user1.ID,
+		FullName: user1.FullName,
+		Age:      user1.Age,
+	}
+
+	user2, err := testQueries.UpdateUser(context.Background(), arg)
+	require.NoError(t, err) //require - требовать , equal - равный, coloumn - столбец
+	require.NotEmpty(t, user2)
+
+	require.Equal(t, user1.ID, user2.ID)
+	require.Equal(t, user1.Email, user2.Email)
+	require.Equal(t, user1.FullName, user2.FullName)
+
+	require.WithinDuration(t, user1.CreatedAt.Time, user2.CreatedAt.Time, time.Second)
+	require.WithinDuration(t, user1.UpdateAt.Time, user2.UpdateAt.Time, time.Second)
+}
+
+func TestDeleteUserByEmail(t *testing.T) {
+	user1 := createRandomUser(t)
+
+	err := testQueries.DeleteUserByEmail(context.Background(), user1.Email)
+	require.NoError(t, err)
+
+	// Проверяем удалился ли аккаунт
+	user2, err := testQueries.GetUserByEmail(context.Background(), user1.Email)
+	require.Error(t, err)
+	require.ErrorIs(t, err, pgx.ErrNoRows) // проверяет, что ошибка err является (или оборачивает) конкретную ошибку pgx.ErrNoRows. ErrorIs для проверки конкретных типов ошибок.
+	require.Empty(t, user2)
+
 }
