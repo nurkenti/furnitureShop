@@ -23,8 +23,7 @@ LIMIT $1 OFFSET $2;
 UPDATE users
 SET 
   full_name = $2,
-  age = $3 ,
-  updated_at = NOW()
+  age = $3
 WHERE id = $1
 RETURNING *;
 
@@ -33,4 +32,6 @@ DELETE FROM users
 WHERE id = $1;
 
 
-
+-- name: DeleteUserByEmail :exec
+DELETE FROM users
+WHERE email = $1;

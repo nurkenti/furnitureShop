@@ -60,6 +60,16 @@ func (q *Queries) DeleteUser(ctx context.Context, id pgtype.UUID) error {
 	return err
 }
 
+const deleteUserByEmail = `-- name: DeleteUserByEmail :exec
+DELETE FROM users
+WHERE email = $1
+`
+
+func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
+	_, err := q.db.Exec(ctx, deleteUserByEmail, email)
+	return err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id, email, password_hash, full_name, age, role, created_at, update_at FROM users
 WHERE email = $1 LIMIT 1
@@ -146,8 +156,7 @@ const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET 
   full_name = $2,
-  age = $3 ,
-  updated_at = NOW()
+  age = $3
 WHERE id = $1
 RETURNING id, email, password_hash, full_name, age, role, created_at, update_at
 `
