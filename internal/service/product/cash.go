@@ -23,7 +23,6 @@ func (b *Bank) AddMoney(a int) error {
 	fmt.Printf("Вы продали товар на сумму: %d\nНа счету %d\n", a, b)
 	return nil
 
-	return nil
 }
 
 func (b *Bank) SellMoney(a int) error {

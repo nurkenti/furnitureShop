@@ -1,8 +1,6 @@
 package db
 
-
-_ "github.com/lib/pq" 
-
+import "database/sql"
 
 var testQueries *Queries
 var testDB *sql.DB // сделали глобал переменную

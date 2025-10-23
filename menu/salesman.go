@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/nurkenti/furnitureShop/internal/domain"
-	"github.com/nurkenti/furnitureShop/internal/service"
+	service "github.com/nurkenti/furnitureShop/internal/service/product"
 )
 
 var wallet = service.MyBank(1000000)
