@@ -85,5 +85,17 @@ func TestDeleteUserByEmail(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorIs(t, err, pgx.ErrNoRows) // проверяет, что ошибка err является (или оборачивает) конкретную ошибку pgx.ErrNoRows. ErrorIs для проверки конкретных типов ошибок.
 	require.Empty(t, user2)
+}
 
+func TestListUsers(t *testing.T) {
+	arg := ListUsersParams{
+		Limit:  5, // сколько записей показать. (0-5)
+		Offset: 0, // типо как стр. Он пропускает записи. (Если написать 5, то он будет показывать 6-10 записи)
+	}
+	users, err := testQueries.ListUsers(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, users, 5) //проверяем длину
+	for _, user := range users {
+		require.NotEmpty(t, user) // проверяем каждую запись то что он не пустой
+	}
 }

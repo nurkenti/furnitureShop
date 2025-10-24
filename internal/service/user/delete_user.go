@@ -9,7 +9,7 @@ import (
 )
 
 func DeleteUserByEmail(q *sqlc.Queries) error {
-	email, err := addInfo("Option: Delete\nEmail: ")
+	email, err := AddInfo("Option: Delete\nEmail: ")
 	if err != nil {
 		return err
 	}
