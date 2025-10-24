@@ -26,13 +26,6 @@ func main() {
 	if err != nil {
 		log.Fatal("❌ Ошибка подключения к БД:", err)
 	}
-	/*conn, err := pgx.Connect(context.Background(), dbSourse)
-	if err != nil {
-		log.Fatal("sex")
-	}
-	defer conn.Close(context.Background())
-	Queries = sqlc.New(conn)
-	*/
 	defer conn.Close(context.Background()) // Закрываем соединение
 	fmt.Println("✅ Подключение к БД успешно!")
 
@@ -79,10 +72,19 @@ func (s *Service) AuthorisationUser() {
 		log.Fatal("Error")
 	}
 }
+
+func (s *Service) LogIn() {
+	err := service.Login(s.queries)
+	if err != nil {
+		log.Fatal("Error with Login")
+	}
+
+}
+
 func (s *Service) MenuLogin() {
 	fmt.Println("Welcome")
 	for {
-		ans, err := service.AddInfo("1.Authorisation\n2.Get user\n3.List\n4.Delete\nexit\nPlease write number: ")
+		ans, err := service.AddInfo("1.Authorisation\n2.Get user\n3.List\n4.Delete\n5.Login\nexit\nPlease write number: ")
 		if err != nil {
 			log.Fatal("Your answer is not correct")
 		}
@@ -97,6 +99,9 @@ func (s *Service) MenuLogin() {
 		}
 		if strings.Contains(ans, "4") {
 			s.DeleteUserByEm()
+		}
+		if strings.Contains(ans, "5") {
+			s.LogIn()
 		}
 		if ans == "exit" {
 			break
