@@ -7,9 +7,10 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/nurkenti/furnitureShop/db/sqlc"
 )
 
-var testQueries *Queries
+var testQueries *sqlc.Queries
 var testDB *pgx.Conn // сделали глобал переменную
 
 const (
@@ -22,6 +23,6 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
-	testQueries = New(testDB)
+	testQueries = sqlc.New(testDB)
 	os.Exit(m.Run())
 }

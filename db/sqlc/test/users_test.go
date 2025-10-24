@@ -8,18 +8,19 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/nurkenti/furnitureShop/db/sqlc"
 	"github.com/nurkenti/furnitureShop/db/util"
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomUser(t *testing.T) User {
-	arg := CreateUserParams{
+func createRandomUser(t *testing.T) sqlc.User {
+	arg := sqlc.CreateUserParams{
 		ID:           pgtype.UUID{Bytes: uuid.New(), Valid: true},
 		Email:        util.RandomEmail(),
 		PasswordHash: util.RandomPassword(),
 		FullName:     util.RandomName(),
 		Age:          int32(util.RandomAge()),
-		Role:         NullUserRole{UserRole: "admin", Valid: true},
+		Role:         sqlc.NullUserRole{UserRole: "admin", Valid: true},
 	}
 
 	user, err := testQueries.CreateUser(context.Background(), arg)
@@ -56,7 +57,7 @@ func TestGetUserByEmail(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	user1 := createRandomUser(t)
 
-	arg := UpdateUserParams{
+	arg := sqlc.UpdateUserParams{
 		ID:       user1.ID,
 		FullName: user1.FullName,
 		Age:      user1.Age,
@@ -88,7 +89,7 @@ func TestDeleteUserByEmail(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
-	arg := ListUsersParams{
+	arg := sqlc.ListUsersParams{
 		Limit:  5, // сколько записей показать. (0-5)
 		Offset: 0, // типо как стр. Он пропускает записи. (Если написать 5, то он будет показывать 6-10 записи)
 	}

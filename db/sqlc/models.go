@@ -11,6 +11,91 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type ChairMaterial string
+
+const (
+	ChairMaterialWood   ChairMaterial = "wood"
+	ChairMaterialMetal  ChairMaterial = "metal"
+	ChairMaterialFabric ChairMaterial = "fabric"
+)
+
+func (e *ChairMaterial) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ChairMaterial(s)
+	case string:
+		*e = ChairMaterial(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ChairMaterial: %T", src)
+	}
+	return nil
+}
+
+type NullChairMaterial struct {
+	ChairMaterial ChairMaterial `json:"chair_material"`
+	Valid         bool          `json:"valid"` // Valid is true if ChairMaterial is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullChairMaterial) Scan(value interface{}) error {
+	if value == nil {
+		ns.ChairMaterial, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ChairMaterial.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullChairMaterial) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ChairMaterial), nil
+}
+
+type ChairModel string
+
+const (
+	ChairModelSonyx  ChairModel = "sonyx"
+	ChairModelKurumi ChairModel = "kurumi"
+)
+
+func (e *ChairModel) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = ChairModel(s)
+	case string:
+		*e = ChairModel(s)
+	default:
+		return fmt.Errorf("unsupported scan type for ChairModel: %T", src)
+	}
+	return nil
+}
+
+type NullChairModel struct {
+	ChairModel ChairModel `json:"chair_model"`
+	Valid      bool       `json:"valid"` // Valid is true if ChairModel is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullChairModel) Scan(value interface{}) error {
+	if value == nil {
+		ns.ChairModel, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.ChairModel.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullChairModel) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.ChairModel), nil
+}
+
 type UserRole string
 
 const (
@@ -53,6 +138,98 @@ func (ns NullUserRole) Value() (driver.Value, error) {
 	return string(ns.UserRole), nil
 }
 
+type WardrobeMaterial string
+
+const (
+	WardrobeMaterialMdf WardrobeMaterial = "mdf"
+	WardrobeMaterialDsp WardrobeMaterial = "dsp"
+)
+
+func (e *WardrobeMaterial) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = WardrobeMaterial(s)
+	case string:
+		*e = WardrobeMaterial(s)
+	default:
+		return fmt.Errorf("unsupported scan type for WardrobeMaterial: %T", src)
+	}
+	return nil
+}
+
+type NullWardrobeMaterial struct {
+	WardrobeMaterial WardrobeMaterial `json:"wardrobe_material"`
+	Valid            bool             `json:"valid"` // Valid is true if WardrobeMaterial is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullWardrobeMaterial) Scan(value interface{}) error {
+	if value == nil {
+		ns.WardrobeMaterial, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.WardrobeMaterial.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullWardrobeMaterial) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.WardrobeMaterial), nil
+}
+
+type WardrobeModel string
+
+const (
+	WardrobeModelUnibi  WardrobeModel = "unibi"
+	WardrobeModelFacito WardrobeModel = "facito"
+)
+
+func (e *WardrobeModel) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = WardrobeModel(s)
+	case string:
+		*e = WardrobeModel(s)
+	default:
+		return fmt.Errorf("unsupported scan type for WardrobeModel: %T", src)
+	}
+	return nil
+}
+
+type NullWardrobeModel struct {
+	WardrobeModel WardrobeModel `json:"wardrobe_model"`
+	Valid         bool          `json:"valid"` // Valid is true if WardrobeModel is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullWardrobeModel) Scan(value interface{}) error {
+	if value == nil {
+		ns.WardrobeModel, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.WardrobeModel.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullWardrobeModel) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.WardrobeModel), nil
+}
+
+type Chair struct {
+	ID        pgtype.UUID       `json:"id"`
+	Model     ChairModel        `json:"model"`
+	Material  NullChairMaterial `json:"material"`
+	Price     pgtype.Float8     `json:"price"`
+	CreatedAt pgtype.Timestamp  `json:"created_at"`
+}
+
 type User struct {
 	ID           pgtype.UUID      `json:"id"`
 	Email        string           `json:"email"`
@@ -62,4 +239,19 @@ type User struct {
 	Role         NullUserRole     `json:"role"`
 	CreatedAt    pgtype.Timestamp `json:"created_at"`
 	UpdateAt     pgtype.Timestamp `json:"update_at"`
+}
+
+type Wardrobe struct {
+	ID        pgtype.UUID          `json:"id"`
+	Model     WardrobeModel        `json:"model"`
+	Material  NullWardrobeMaterial `json:"material"`
+	Price     float64              `json:"price"`
+	CreatedAt pgtype.Timestamp     `json:"created_at"`
+}
+
+type Warehouse struct {
+	ProductModel string           `json:"product_model"`
+	ProductType  string           `json:"product_type"`
+	Quantity     int32            `json:"quantity"`
+	UpdatedAt    pgtype.Timestamp `json:"updated_at"`
 }
