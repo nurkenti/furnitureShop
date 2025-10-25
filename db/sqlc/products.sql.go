@@ -173,18 +173,25 @@ func (q *Queries) GetWardrobeByModel(ctx context.Context, model WardrobeModel) (
 
 const getWarhouse = `-- name: GetWarhouse :one
 
-SELECT FROM warehouse
+SELECT 
+   product_model, 
+   product_type, 
+   quantity, 
+   updated_at 
+FROM warehouse
 Where product_model = $1 LIMIT 1
 `
 
-type GetWarhouseRow struct {
-}
-
 // Warehouse
-func (q *Queries) GetWarhouse(ctx context.Context, productModel string) (GetWarhouseRow, error) {
+func (q *Queries) GetWarhouse(ctx context.Context, productModel string) (Warehouse, error) {
 	row := q.db.QueryRow(ctx, getWarhouse, productModel)
-	var i GetWarhouseRow
-	err := row.Scan()
+	var i Warehouse
+	err := row.Scan(
+		&i.ProductModel,
+		&i.ProductType,
+		&i.Quantity,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 
@@ -364,7 +371,7 @@ func (q *Queries) UpdateWardrobe(ctx context.Context, arg UpdateWardrobeParams) 
 
 const updateWarehouseQuantity = `-- name: UpdateWarehouseQuantity :exec
 UPDATE warehouse
-SET quantity = $2, update_at = now()
+SET quantity = $2, updated_at = now()
 WHERE product_model = $1
 `
 

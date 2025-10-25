@@ -72,12 +72,17 @@ LIMIT $1 OFFSET $2;
 /* Warehouse*/
 
 -- name: GetWarhouse :one
-SELECT FROM warehouse
+SELECT 
+   product_model, 
+   product_type, 
+   quantity, 
+   updated_at 
+FROM warehouse
 Where product_model = $1 LIMIT 1;
 
 -- name: UpdateWarehouseQuantity :exec
 UPDATE warehouse
-SET quantity = $2, update_at = now()
+SET quantity = $2, updated_at = now()
 WHERE product_model = $1; 
 
 -- name: ListWarehouse :many

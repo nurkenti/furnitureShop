@@ -55,3 +55,28 @@ func RandomRole() string {
 	}
 	return ""
 }
+
+func RandomModel(a, b string) string {
+	ab := a
+	ba := b
+	if rand.Intn(2) == 0 {
+		return ab
+	} else {
+		return ba
+	}
+}
+func RandomMaterial(a, b, c string) string {
+	a1 := a
+	b1 := b
+	c1 := c
+	r := rand.Intn(3)
+	switch r {
+	case 1:
+		return a1
+	case 2:
+		return b1
+	case 0:
+		return c1
+	}
+	return ""
+}

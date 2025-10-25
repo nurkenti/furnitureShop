@@ -8,6 +8,7 @@ import (
 
 	"github.com/nurkenti/furnitureShop/db"
 	"github.com/nurkenti/furnitureShop/db/sqlc"
+	"github.com/nurkenti/furnitureShop/db/util"
 	service "github.com/nurkenti/furnitureShop/internal/service/user"
 	"github.com/nurkenti/furnitureShop/menu"
 )
@@ -33,7 +34,9 @@ func main() {
 		queries: queries,
 	}
 
-	server.MenuLogin()
+	/*server.MenuLogin()*/
+	fmt.Println(server)
+	fmt.Println(util.RandomMaterial("a", "b", "c"))
 }
 
 func (s *Service) GetUser() {

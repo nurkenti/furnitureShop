@@ -25,30 +25,30 @@ CREATE TYPE "wardrobe_material" AS ENUM (
 );
 
 CREATE TABLE "users" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid),
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   "email" varchar UNIQUE NOT NULL,
   "password_hash" varchar NOT NULL,
   "full_name" varchar NOT NULL,
   "age" int NOT NULL,
-  "role" user_role DEFAULT (castomer),
-  "created_at" timestamp DEFAULT (now()),
-  "update_at" timestamp DEFAULT (now())
+  "role" user_role DEFAULT 'customer',
+  "created_at" timestamp DEFAULT now(),
+  "update_at" timestamp DEFAULT now()
 );
 
 CREATE TABLE "chair" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid),
-  "model" chair_model NOT NULL DEFAULT (sonyx),
-  "material" chair_material DEFAULT (wood),
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "model" chair_model NOT NULL DEFAULT 'sonyx',
+  "material" chair_material DEFAULT 'wood',
   "price" float,
-  "created_at" timestamp DEFAULT (now())
+  "created_at" timestamp DEFAULT now()
 );
 
 CREATE TABLE "wardrobe" (
-  "id" uuid PRIMARY KEY DEFAULT (gen_random_uuid),
-  "model" wardrobe_model NOT NULL DEFAULT (unibi),
-  "material" wardrobe_material DEFAULT (mdf),
+  "id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  "model" wardrobe_model NOT NULL DEFAULT 'unibi',
+  "material" wardrobe_material DEFAULT 'mdf',
   "price" float NOT NULL,
-  "created_at" timestamp DEFAULT (now())
+  "created_at" timestamp DEFAULT now()
 );
 
 CREATE TABLE "warehouse" (

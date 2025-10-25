@@ -35,3 +35,4 @@ WHERE id = $1;
 -- name: DeleteUserByEmail :exec
 DELETE FROM users
 WHERE email = $1;
+
