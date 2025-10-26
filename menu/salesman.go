@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/nurkenti/furnitureShop/internal/domain"
-	service "github.com/nurkenti/furnitureShop/internal/service/product"
+	service "github.com/nurkenti/furnitureShop/internal/service/old"
 )
 
 var wallet = service.MyBank(1000000)
@@ -32,7 +32,7 @@ func Doing() {
 		menuItems := []string{"Купить товар", "Поиск", "Удалить товар", "Продать товар", "Выход", "Баланс"}
 		u := &UserInput{}
 
-		CreatMenu(prompt, menuItems, u)
+		CreateMenu(prompt, menuItems, u)
 		fmt.Printf("\nВы выбрали: %s\n", u.option.Text)
 
 		switch u.option.ID {
@@ -122,7 +122,7 @@ func BuyProduct() {
 	prompt := "Выберите товар: "
 	menuItems := []string{"Chair", "Wardrobe", "Conditioner"}
 	u := &UserInput{}
-	CreatMenu(prompt, menuItems, u)
+	CreateMenu(prompt, menuItems, u)
 	// numProd, err := strconv.Atoi(u.option.Text)
 	// if err != nil {
 	// 	fmt.Println("Ошибка из string в int", err)
@@ -262,7 +262,7 @@ func Model(a, b string) string {
 	promptModel := "Выберите модель: "
 	menuItemsModel := []string{a, b}
 	uModel := &UserInput{}
-	CreatMenu(promptModel, menuItemsModel, uModel)
+	CreateMenu(promptModel, menuItemsModel, uModel)
 	fmt.Println("Вы выбрали:", uModel.option.Text)
 	return uModel.option.Text
 }
@@ -275,7 +275,7 @@ func Price(a, b, c int) int {
 		priceOptions = append(priceOptions, fmt.Sprint(price))
 	}
 	uPrice := &UserInput{}
-	CreatMenu(promptPrice, priceOptions, uPrice)
+	CreateMenu(promptPrice, priceOptions, uPrice)
 	fmt.Println("Вы выбрали:", uPrice.option.Text)
 	num, err := strconv.Atoi(uPrice.option.Text)
 	if err != nil {
@@ -289,7 +289,7 @@ func Material(a, b, c string) string {
 	promptMaterial := "Выберите материал: "
 	menuItemsMaterial := []string{a, b, c}
 	uMaterial := &UserInput{}
-	CreatMenu(promptMaterial, menuItemsMaterial, uMaterial)
+	CreateMenu(promptMaterial, menuItemsMaterial, uMaterial)
 	fmt.Println("Вы выбрали:", uMaterial.option.Text)
 	return uMaterial.option.Text
 }
@@ -297,7 +297,7 @@ func Version() string {
 	promptVersion := "Выберите Версию: "
 	menuItemsVersion := []string{"super01", "cco2", "312ultra"}
 	uVersion := &UserInput{}
-	CreatMenu(promptVersion, menuItemsVersion, uVersion)
+	CreateMenu(promptVersion, menuItemsVersion, uVersion)
 	fmt.Println("Вы выбрали:", uVersion.option.Text)
 	return uVersion.option.Text
 

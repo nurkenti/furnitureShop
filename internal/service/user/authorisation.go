@@ -1,8 +1,10 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -61,18 +63,18 @@ func Authorisation(q *sqlc.Queries) error {
 	return nil
 }
 func AddInfo(prompt string) (string, error) {
-	var ans string
 	fmt.Print(prompt)
-	_, err := fmt.Scan(&ans)
-	if err != nil {
-		return "", err
+	scanner := bufio.NewScanner(os.Stdin) //Читает целую строку до \n
+	if scanner.Scan() {
+		return strings.TrimSpace(scanner.Text()), nil
 	}
-	return ans, nil
+
+	return "", scanner.Err()
 }
 
 func FormatInfo(user sqlc.User) {
 	fmt.Printf("Name:%s \nEmail:%s\n", user.FullName, user.Email)
 	fmt.Printf("   ID: %s\n", uuid.UUID(user.ID.Bytes).String())
 	fmt.Printf("   Возраст: %d\n   Роль: %s\n", user.Age, user.Role.UserRole)
-	fmt.Printf("   Создан: %s\n\n", user.CreatedAt.Time.Format("2006-01-02 15:04:05"))
+	fmt.Printf("   Создан: %s\n", user.CreatedAt.Time.Format("2006-01-02 15:04:05"))
 }

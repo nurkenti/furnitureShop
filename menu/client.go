@@ -6,14 +6,14 @@ func MenuClient() {
 	prompt := "Выберите товар: "
 	menuItems := []string{"Chair", "Wardrobe", "Conditioner"}
 	u := &UserInput{}
-	CreatMenu(prompt, menuItems, u)
+	CreateMenu(prompt, menuItems, u)
 	fmt.Println("Вы выбрали:", u.option.Text)
 }
 func ClientChairModel() { // Модель стула
 	prompt2 := "Какая модель вас устраевает: "
 	menuItems2 := []string{"Sonyx", "Kurumi"}
 	u2 := &UserInput{}
-	CreatMenu(prompt2, menuItems2, u2)
+	CreateMenu(prompt2, menuItems2, u2)
 	fmt.Println(u2.option.Text, " Отличный выбор!")
 }
 func CliChSum() { //Покупатель пишет сколько надо

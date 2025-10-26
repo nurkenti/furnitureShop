@@ -222,6 +222,7 @@ func TestUpdateWardrobe(t *testing.T) {
 }
 
 func TestGetWarehouse(t *testing.T) {
+// Просто сделали без creat. 
 	productModels := []string{"sonyx", "kurumi", "unibi", "facito"}
 
 	for _, model := range productModels {
