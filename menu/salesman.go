@@ -3,14 +3,18 @@ package menu
 import (
 	"bufio"
 	"fmt"
-	"github/kaiiiman/chairStore/storage"
-	"github/kaiiiman/chairStore/warehouse"
 	"log"
 	"math/rand"
 	"os"
 	"strconv"
+	"strings"
 	"time"
+
+	"github.com/nurkenti/furnitureShop/internal/domain"
+	"github.com/nurkenti/furnitureShop/internal/service"
 )
+
+var wallet = service.MyBank(1000000)
 
 func Salesman1() {
 	fmt.Println("Вы выбрали роль Продовца), Ваша задача прибрести товар и продать их покупателям")
@@ -25,7 +29,7 @@ func Doing() {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		prompt := "Выберите действие: "
-		menuItems := []string{"Купить товар", "Поиск", "Удалить товар", "Продать товар", "Выход"}
+		menuItems := []string{"Купить товар", "Поиск", "Удалить товар", "Продать товар", "Выход", "Баланс"}
 		u := &UserInput{}
 
 		CreatMenu(prompt, menuItems, u)
@@ -33,15 +37,22 @@ func Doing() {
 
 		switch u.option.ID {
 		case 0:
-			BuyChair()
+			BuyProduct()
 		case 1:
 			LoadStorage("Чтобы найти товар напишите модель: ")
 		case 2:
-			DelChairMan()
+			DelProductM()
 		case 3:
-			SellChair()
+			SellProduct()
 		case 4:
 			Timeloading(1, "Завершить работу...")
+			return
+		case 5:
+			fmt.Printf("Ваш счет в Банке: %d\n \n", wallet)
+			Timeloading(4, "...")
+			continue
+		default:
+			fmt.Println("Выберите из 5 пунктов")
 			return
 		}
 		Timeloading(1, "")
@@ -52,33 +63,59 @@ func Doing() {
 }
 
 func LoadStorage(s string) {
-	db := storage.NewStorage("data, json")
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
-		log.Println("Не удалось загрузить данные", err)
+		log.Fatal("Не удалось загрузить данные", err)
 	}
-	fmt.Println(s)
-	var nameUserAns string
-	fmt.Print("Данные о товаре: ")
-	_, err := fmt.Scan(&nameUserAns)
-	if err != nil {
-		fmt.Println("Ошибка! Надо написать", err)
+
+	var typeAns string
+	fmt.Print("Напишите тип товара :")
+	_, errs := fmt.Scan(&typeAns)
+	if errs != nil {
+		log.Fatal("Ошибка Надо написать ", errs)
+	}
+
+	searchProduct := make(map[string]interface{})
+
+	if typeAns != "" {
+		switch typeAns {
+		case "chair", "wardrobe", "conditioner":
+			searchProduct["type"] = typeAns
+		default:
+			fmt.Println("Ошибка: недопустимый тип товара")
+			return
+		}
 	}
 	Timeloading(2, "Поиск...")
 	// Поиск товара
-	chairs, err := db.Find(map[string]interface{}{
-		"name": nameUserAns,
-	})
+	productCheck, err := db.Find(searchProduct)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
 	}
-	fmt.Println(chairs)
+	if len(searchProduct) == 0 {
+		fmt.Println("Товар не найден")
+		return
+	}
+
+	fmt.Println("\nНайденный товары: ")
+	for i, p := range productCheck {
+		{
+			fmt.Printf("%d.ID: %d, model: %s, price: %d, instock: %d\n",
+				i+1,
+				p.GetID(),
+				p.GetModel(),
+				p.GetPrice(),
+				p.GetInStock())
+		}
+	}
 }
 
-func BuyChair() {
+func BuyProduct() {
 	// Тут у меня загрузил склад
-	db := storage.NewStorage("data, json")
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
-		log.Println("Не удалось загрузить данные", err)
+		log.Fatal("Не удалось загрузить данные", err)
 	}
 
 	fmt.Println("Что вы хотите купить ?")
@@ -86,91 +123,251 @@ func BuyChair() {
 	menuItems := []string{"Chair", "Wardrobe", "Conditioner"}
 	u := &UserInput{}
 	CreatMenu(prompt, menuItems, u)
-	fmt.Println("Вы выбрали:", u.option.Text)
-	// Model
-	promptModel := "Выберите товар: "
-	menuItemsModel := []string{"Sonyx", "Kurumi"}
+	// numProd, err := strconv.Atoi(u.option.Text)
+	// if err != nil {
+	// 	fmt.Println("Ошибка из string в int", err)
+	// }
+	switch u.option.ID {
+	case 0:
+		addChair(db)
+	case 1:
+		addWardrobe(db)
+	case 2:
+		addConditioner(db)
+
+	}
+}
+func addChair(db *service.Storage) error {
+	i := ID()
+	m := Model("Sonyx", "Kurumi")
+	ma := Material("wood", "metal", "plastic")
+	pr := Price(5000, 10000, 20000)
+	in := Instock("стульев")
+	chair := &domain.Chair{
+		BaseProduct: domain.BaseProduct{
+			ID:      i,
+			Model:   m,
+			Price:   pr,
+			InStock: in,
+		},
+		Material: ma,
+		Type:     "chair",
+	}
+	PriseStock := pr * in
+	err := CashSell(PriseStock)
+	if err != nil {
+		return err
+	}
+	Timeloading(3, "Идет процесс покупки...")
+	if err := db.AddProduct(chair); err != nil {
+		log.Fatal("Ошибка добавление товара", err)
+	}
+
+	Timeloading(3, "Товар успешно добавлен и сохранен!")
+	return nil
+}
+
+// Денежные итераций
+func CashSell(ps int) error {
+	Timeloading(2, "...")
+	err := wallet.SellMoney(ps)
+	Timeloading(2, "")
+	if err != nil {
+		fmt.Printf("У вас не достаточно денег! \n Товар: %d\n На счету: %d\n", ps, wallet)
+		Timeloading(4, "")
+		return err
+	}
+	return nil
+}
+func CashBuy(ps int) error {
+	fmt.Printf("У вас на счету: %d\n", wallet)
+	Timeloading(2, "...")
+	err := wallet.AddMoney(ps)
+	if err != nil {
+		fmt.Printf("У вас не достаточно денег.\n Товар: %d\n На счету: %d", ps, wallet)
+		return err
+	}
+	return nil
+}
+
+func addWardrobe(db *service.Storage) error {
+	i := ID()
+	m := Model("Unibi", "Facito")
+	mat := Material("wood", "metal", "bamboo")
+	p := Price(20000, 50000, 100000)
+	in := Instock("шкафа")
+	wardrobe := &domain.Wardrobe{
+		BaseProduct: domain.BaseProduct{
+			ID:    i,
+			Model: m,
+
+			Price:   p,
+			InStock: in,
+		},
+		Material: mat,
+		Type:     "wardrobe",
+	}
+	PriseStock := p * in
+
+	err := CashSell(PriseStock)
+	if err != nil {
+		return err
+	}
+
+	Timeloading(3, "Идет процесс покупки...")
+	if err := db.AddProduct(wardrobe); err != nil {
+		log.Fatal("Ошибка добавление товара", err)
+	}
+
+	Timeloading(3, "Товар успешно добавлен и сохранен!")
+	return nil
+}
+func addConditioner(db *service.Storage) error {
+	i := ID()
+	m := Model("Xpx", "Faca")
+	mat := Version()
+	p := Price(40000, 150000, 620000)
+	in := Instock("кондиционеров")
+	conditioner := &domain.Conditioner{
+		BaseProduct: domain.BaseProduct{
+			ID:      i,
+			Model:   m,
+			Price:   p,
+			InStock: in,
+		},
+		Version: mat,
+		Type:    "conditioner",
+	}
+	PriseStock := p * in
+
+	err := CashSell(PriseStock)
+	if err != nil {
+		return err
+	}
+
+	Timeloading(3, "Идет процесс покупки...")
+	if err := db.AddProduct(conditioner); err != nil {
+		log.Fatal("Ошибка добавление товара", err)
+	}
+	Timeloading(3, "Товар успешно добавлен и сохранен!")
+	return nil
+}
+
+func ID() int {
+	ids := rand.Intn(1000)
+	return ids
+}
+
+func Model(a, b string) string {
+	promptModel := "Выберите модель: "
+	menuItemsModel := []string{a, b}
 	uModel := &UserInput{}
 	CreatMenu(promptModel, menuItemsModel, uModel)
 	fmt.Println("Вы выбрали:", uModel.option.Text)
-	// Material
-	promptMaterial := "Выберите материал: "
-	menuItemsMaterial := []string{"wood", "metal", "plastic"}
-	uMaterial := &UserInput{}
-	CreatMenu(promptMaterial, menuItemsMaterial, uMaterial)
-	fmt.Println("Вы выбрали:", uMaterial.option.Text)
-	// Price
+	return uModel.option.Text
+}
+
+func Price(a, b, c int) int {
 	promptPrice := "Прайс: "
-	menuItemsPrice := []string{"5000", "15000", "30000"}
+	menuItemsPrice := []int{a, b, c}
+	var priceOptions []string
+	for _, price := range menuItemsPrice {
+		priceOptions = append(priceOptions, fmt.Sprint(price))
+	}
 	uPrice := &UserInput{}
-	CreatMenu(promptPrice, menuItemsPrice, uPrice)
+	CreatMenu(promptPrice, priceOptions, uPrice)
 	fmt.Println("Вы выбрали:", uPrice.option.Text)
 	num, err := strconv.Atoi(uPrice.option.Text)
 	if err != nil {
 		fmt.Println("Ошибка из string в int", err)
 	}
+	return num
+}
+func Material(a, b, c string) string {
 
+	// Material
+	promptMaterial := "Выберите материал: "
+	menuItemsMaterial := []string{a, b, c}
+	uMaterial := &UserInput{}
+	CreatMenu(promptMaterial, menuItemsMaterial, uMaterial)
+	fmt.Println("Вы выбрали:", uMaterial.option.Text)
+	return uMaterial.option.Text
+}
+func Version() string {
+	promptVersion := "Выберите Версию: "
+	menuItemsVersion := []string{"super01", "cco2", "312ultra"}
+	uVersion := &UserInput{}
+	CreatMenu(promptVersion, menuItemsVersion, uVersion)
+	fmt.Println("Вы выбрали:", uVersion.option.Text)
+	return uVersion.option.Text
+
+}
+func Instock(a string) int {
 	//InStock
-	fmt.Print("Количество стульев: ")
+	fmt.Printf("Количество %s: ", a)
 	var uInStock int
 	fmt.Scan(&uInStock)
+	return uInStock
 
-	// ID
-	ids := rand.Intn(1000)
-
-	Timeloading(3, "Идет процесс покупки...")
-	// Загружаем товар
-	db.AddChair(warehouse.Chair{
-		Id:       ids,
-		Name:     uModel.option.Text,
-		Material: uMaterial.option.Text,
-		Price:    num,
-		InStock:  uInStock,
-	})
-	fmt.Println("Вы купили chair")
 }
 
-func DelChairMan() {
-	db := storage.NewStorage("data, json")
+func DelProductM() {
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Println("Не удалось загрузить данные", err)
 	}
-	var i int
-	LoadStorage("Чтобы удалить товар из базы нужно найти id c помощю модели")
 
-	fmt.Print("ID: ")
-	_, err := fmt.Scan(&i)
-	if err != nil {
-		fmt.Println("Ошибка при вводе цифр", err)
+	fmt.Println("Чтобы удалить товар надо сначала найти его id")
+	LoadStorage("Напишите тип товара")
+
+	fmt.Println("Введите id чтобы удалить товар: ")
+	var id int
+	if _, err := fmt.Scan(&id); err != nil {
+		log.Fatal("Ошибка при вводе ID")
 	}
-	Timeloading(2, "Процесс удаление товара...")
-	if err := db.DelChair(i); err != nil {
-		log.Fatal()
+	// 5. Подтверждение удаления
+	fmt.Printf("Вы уверены, что хотите удалить товар с ID %d? (y/n): ", id)
+	var confirm string
+	fmt.Scan(&confirm)
+	if strings.ToLower(confirm) != "y" {
+		fmt.Println("Удаление отменено")
+		return
 	}
+
+	if err := db.DelProduct(id); err != nil {
+		log.Fatal("Ошибки при удаление товара", err)
+	}
+	fmt.Println("Товар успешно удален")
 }
 
-func SellChair() {
-	db := storage.NewStorage("data, json")
+func SellProduct() {
+	db := service.NewStorage("data.json")
 	if err := db.Load(); err != nil {
 		log.Println("Не удалось загрузить данные", err)
 	}
 	fmt.Println("Вы хотите продать товар")
 	LoadStorage("Чтобы найти Id и количество на складе введите модель: ")
-	fmt.Print("Пожалуйста ведите id и количество : ")
+	fmt.Print("Пожалуйста ведите id: ")
 	var idr int
 	var instock int
-	_, err := fmt.Scan(&idr, &instock)
+	_, err := fmt.Scan(&idr)
+	fmt.Print("Пожалуйста ведите количество: ")
+	_, errs := fmt.Scan(&instock)
 	if err != nil {
+		fmt.Println("Ошибка при вводе цифр", err)
+	}
+	if errs != nil {
 		fmt.Println("Ошибка при вводе цифр", err)
 	}
 	Timeloading(4, "Обработка покупки...")
 
-	soldChair, err := db.Sell(idr, instock)
+	soldProduct, err := db.Sell(idr, instock)
 	if err != nil {
 		log.Fatal("Ошибка продажи ", err)
 	}
-	fmt.Printf("💰 Продано %d стульев модели '%s'\n", 3, soldChair.Name)
-	fmt.Printf("📊 Остаток на складе: %d\n", soldChair.InStock)
+	ds := soldProduct.GetPrice() * instock
+	wallet.AddMoney(ds)
+	Timeloading(2, "")
 }
 
 func Timeloading(n time.Duration, s string) {

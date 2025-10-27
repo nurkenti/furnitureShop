@@ -1,0 +1,376 @@
+{
+  "136": {
+    "type": "chair",
+    "data": {
+      "id": 136,
+      "model": "Sonyx",
+      "in_stock": 0,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "156": {
+    "type": "chair",
+    "data": {
+      "id": 156,
+      "model": "Sonyx",
+      "in_stock": 7,
+      "price": 10000,
+      "material": "metal",
+      "type": "chair"
+    }
+  },
+  "164": {
+    "type": "chair",
+    "data": {
+      "id": 164,
+      "model": "Sonyx",
+      "in_stock": 15,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "180": {
+    "type": "chair",
+    "data": {
+      "id": 180,
+      "model": "Kurumi",
+      "in_stock": 14,
+      "price": 20000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "195": {
+    "type": "chair",
+    "data": {
+      "id": 195,
+      "model": "Sonyx",
+      "in_stock": 5,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "23": {
+    "type": "chair",
+    "data": {
+      "id": 23,
+      "model": "Sonyx",
+      "in_stock": 1,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "323": {
+    "type": "chair",
+    "data": {
+      "id": 323,
+      "model": "Sonyx",
+      "in_stock": 1,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "333": {
+    "type": "chair",
+    "data": {
+      "id": 333,
+      "model": "Sonyx",
+      "in_stock": 20,
+      "price": 10000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "34": {
+    "type": "chair",
+    "data": {
+      "id": 34,
+      "model": "Sonyx",
+      "in_stock": 10,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "385": {
+    "type": "chair",
+    "data": {
+      "id": 385,
+      "model": "Sonyx",
+      "in_stock": 5,
+      "price": 20000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "423": {
+    "type": "chair",
+    "data": {
+      "id": 423,
+      "model": "Sonyx",
+      "in_stock": 12,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "427": {
+    "type": "conditioner",
+    "data": {
+      "id": 427,
+      "model": "Xpx",
+      "in_stock": 1,
+      "price": 620000,
+      "version": "312ultra",
+      "type": "conditioner"
+    }
+  },
+  "433": {
+    "type": "chair",
+    "data": {
+      "id": 433,
+      "model": "Sonyx",
+      "in_stock": 1000,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "444": {
+    "type": "chair",
+    "data": {
+      "id": 444,
+      "model": "Sonyx",
+      "in_stock": 13,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "475": {
+    "type": "chair",
+    "data": {
+      "id": 475,
+      "model": "Sonyx",
+      "in_stock": 0,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "484": {
+    "type": "chair",
+    "data": {
+      "id": 484,
+      "model": "Sonyx",
+      "in_stock": 0,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "522": {
+    "type": "chair",
+    "data": {
+      "id": 522,
+      "model": "Sonyx",
+      "in_stock": 100,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "540": {
+    "type": "chair",
+    "data": {
+      "id": 540,
+      "model": "Sonyx",
+      "in_stock": 10,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "548": {
+    "type": "chair",
+    "data": {
+      "id": 548,
+      "model": "Sonyx",
+      "in_stock": 10,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "640": {
+    "type": "chair",
+    "data": {
+      "id": 640,
+      "model": "Sonyx",
+      "in_stock": 100,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "67": {
+    "type": "chair",
+    "data": {
+      "id": 67,
+      "model": "Kurumi",
+      "in_stock": 20,
+      "price": 20000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "681": {
+    "type": "chair",
+    "data": {
+      "id": 681,
+      "model": "Sonyx",
+      "in_stock": 2,
+      "price": 5000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "69": {
+    "type": "chair",
+    "data": {
+      "id": 69,
+      "model": "Sonyx",
+      "in_stock": 5,
+      "price": 20000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "742": {
+    "type": "chair",
+    "data": {
+      "id": 742,
+      "model": "Sonyx",
+      "in_stock": 0,
+      "price": 20000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "812": {
+    "type": "wardrobe",
+    "data": {
+      "id": 812,
+      "model": "Facito",
+      "in_stock": 10,
+      "price": 20000,
+      "material": "metal",
+      "type": "wardrobe"
+    }
+  },
+  "818": {
+    "type": "chair",
+    "data": {
+      "id": 818,
+      "model": "Sonyx",
+      "in_stock": 12,
+      "price": 10000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "840": {
+    "type": "chair",
+    "data": {
+      "id": 840,
+      "model": "Sonyx",
+      "in_stock": 5,
+      "price": 20000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "857": {
+    "type": "chair",
+    "data": {
+      "id": 857,
+      "model": "Kurumi",
+      "in_stock": 15,
+      "price": 10000,
+      "material": "plastic",
+      "type": "chair"
+    }
+  },
+  "858": {
+    "type": "chair",
+    "data": {
+      "id": 858,
+      "model": "Sonyx",
+      "in_stock": 2,
+      "price": 10000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "932": {
+    "type": "chair",
+    "data": {
+      "id": 932,
+      "model": "Kurumi",
+      "in_stock": 5,
+      "price": 10000,
+      "material": "metal",
+      "type": "chair"
+    }
+  },
+  "965": {
+    "type": "wardrobe",
+    "data": {
+      "id": 965,
+      "model": "Unibi",
+      "in_stock": 3,
+      "price": 100000,
+      "material": "bamboo",
+      "type": "wardrobe"
+    }
+  },
+  "972": {
+    "type": "wardrobe",
+    "data": {
+      "id": 972,
+      "model": "Facito",
+      "in_stock": 4,
+      "price": 50000,
+      "material": "bamboo",
+      "type": "wardrobe"
+    }
+  },
+  "981": {
+    "type": "chair",
+    "data": {
+      "id": 981,
+      "model": "Sonyx",
+      "in_stock": 13,
+      "price": 10000,
+      "material": "wood",
+      "type": "chair"
+    }
+  },
+  "989": {
+    "type": "chair",
+    "data": {
+      "id": 989,
+      "model": "Sonyx",
+      "in_stock": 5,
+      "price": 20000,
+      "material": "metal",
+      "type": "chair"
+    }
+  }
+}
