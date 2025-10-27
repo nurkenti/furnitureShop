@@ -20,7 +20,7 @@ migratedown:
 		migrate -path db/migration -database "postgresql://nurken:123nura123@127.0.0.1:5433/furnitureShop?sslmode=disable" -verbose down
 
 
-.PHONY: run, postgres, createdb, dropdb, migrateup, migratedowm
+.PHONY: run, postgres, createdb, dropdb, migrateup, migratedowm, test, build
 
 test: 
 	go test -v ./...
