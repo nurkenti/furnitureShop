@@ -5,9 +5,9 @@ name: ci-test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "feature/add-DB" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "feature/add-DB" ]
 
 jobs:
   test:
