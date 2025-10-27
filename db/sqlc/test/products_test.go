@@ -61,6 +61,8 @@ func TestGetChair(t *testing.T) {
 }
 
 func TestGetChairByModel(t *testing.T) {
+	// Создаем стул с конкретными данными
+
 	chair1 := createRandomChair(t)
 	chair2, err := testQueries.GetChairByModel(context.Background(), chair1.Model)
 	require.NoError(t, err)
@@ -177,6 +179,11 @@ func TestGetWardrobeByModel(t *testing.T) {
 }
 
 func TestListWardrobe(t *testing.T) {
+	// Сначала создаем 5 записей
+	for i := 0; i < 5; i++ {
+		createRandomChair(t)
+	}
+
 	arg := sqlc.ListWardrobeParams{
 		Limit:  5,
 		Offset: 0,
@@ -222,7 +229,7 @@ func TestUpdateWardrobe(t *testing.T) {
 }
 
 func TestGetWarehouse(t *testing.T) {
-// Просто сделали без creat. 
+	// Просто сделали без creat.
 	productModels := []string{"sonyx", "kurumi", "unibi", "facito"}
 
 	for _, model := range productModels {
