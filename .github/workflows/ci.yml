@@ -40,5 +40,11 @@ jobs:
     - name: Run migrations
       run: make migrateup
 
+    - name: install golang-migrate
+      run: |
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.19.0/migrate.darwin-amd64.tar.gz | tar xvz
+        sudo mv migrate.linux-amd64 /usr/bin/
+        whith migrate
+
     - name: Test
       run: make test
