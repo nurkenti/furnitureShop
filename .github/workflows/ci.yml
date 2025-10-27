@@ -5,14 +5,14 @@ name: ci-test
 
 on:
   push:
-    branches: [ "feature/allNew" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "feature/allNew" ]
+    branches: [ "main" ]
 
 jobs:
   test:
-  name: Test
-  build:
+    name: Test
+
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
