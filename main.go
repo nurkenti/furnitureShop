@@ -153,5 +153,4 @@ func (s *Service) ChairMenu() {
 			menu.Timeloading(1, "Loading")
 		}
 	}
-
 }

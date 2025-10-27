@@ -46,7 +46,7 @@ func AddChair(q *sqlc.Queries) error {
 }
 
 func GetChair(q *sqlc.Queries) error {
-	ans, err := user.AddInfo("Search Chair \nChair ID: ")
+	ans, err := user.AddInfo("Search Chair \nChair ID:")
 	if err != nil {
 		return err
 	}
