@@ -212,7 +212,7 @@ func (q *Queries) ListChairs(ctx context.Context, arg ListChairsParams) ([]Chair
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Chair
+	items := []Chair{}
 	for rows.Next() {
 		var i Chair
 		if err := rows.Scan(
@@ -249,7 +249,7 @@ func (q *Queries) ListWardrobe(ctx context.Context, arg ListWardrobeParams) ([]W
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Wardrobe
+	items := []Wardrobe{}
 	for rows.Next() {
 		var i Wardrobe
 		if err := rows.Scan(
@@ -280,7 +280,7 @@ func (q *Queries) ListWarehouse(ctx context.Context) ([]Warehouse, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Warehouse
+	items := []Warehouse{}
 	for rows.Next() {
 		var i Warehouse
 		if err := rows.Scan(

@@ -19,8 +19,18 @@ migrateup:
 migratedown:
 		migrate -path db/migration -database "postgresql://nurken:123nura123@127.0.0.1:5433/furnitureShop?sslmode=disable" -verbose down
 
+server:
+	go run main.go
 
-.PHONY: run, postgres, createdb, dropdb, migrateup, migratedowm, test, build
+mock:
+	mockgen -package mockdb -destination db/mock/store.go github.com/nurkenti/furnitureShop/db/sqlc Store
+
+coverage:
+	go test -coverprofile=coverage.out ./api/...
+	go tool cover -func=coverage.out
+
+
+.PHONY: run, postgres, createdb, dropdb, migrateup, migratedowm, test, build, server, mock, coverage
 
 test: 
 	go test -v ./...

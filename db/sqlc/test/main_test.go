@@ -8,18 +8,18 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/nurkenti/furnitureShop/db/sqlc"
+	"github.com/nurkenti/furnitureShop/db/util"
 )
 
 var testQueries *sqlc.Queries
 var testDB *pgx.Conn // сделали глобал переменную
 
-const (
-	dbSourse = "postgresql://nurken:123nura123@127.0.0.1:5433/furnitureShop?sslmode=disable"
-)
-
 func TestMain(m *testing.M) {
-	var err error
-	testDB, err = pgx.Connect(context.Background(), dbSourse)
+	config, err := util.LoadConfig("../../..")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+	testDB, err = pgx.Connect(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}

@@ -6,8 +6,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/nurkenti/furnitureShop/db"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/nurkenti/furnitureShop/api"
 	"github.com/nurkenti/furnitureShop/db/sqlc"
+	"github.com/nurkenti/furnitureShop/db/util"
 	product "github.com/nurkenti/furnitureShop/internal/service/product"
 	user "github.com/nurkenti/furnitureShop/internal/service/user"
 	"github.com/nurkenti/furnitureShop/menu"
@@ -17,25 +19,30 @@ type Service struct {
 	queries *sqlc.Queries
 }
 
-const (
-	dbSourse = "postgresql://nurken:123nura123@127.0.0.1:5433/furnitureShop?sslmode=disable"
-)
-
 func main() {
-	fmt.Println("Connect with db")
-	queries, conn, err := db.NewDB()
+	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Fatal("❌ Ошибка подключения к БД:", err)
+		log.Fatal("cannot load config:", err)
 	}
-	defer conn.Close(context.Background()) // Закрываем соединение
-	fmt.Print("✅ Подключение к БД успешно!\n")
 
-	server := &Service{
-		queries: queries,
+	conn, err := pgxpool.New(context.Background(), config.DBSource)
+	if err != nil {
+		log.Fatal("cannot connect to db", err)
+	}
+	defer conn.Close()
+
+	//server := &Service{
+	//	queries: queries,
+	//	}
+	queries := sqlc.New(conn)
+	server := api.NewServer(queries)
+	err = server.Start(config.ServerAddress)
+	if err != nil {
+		log.Fatal("cannot start server", err)
 	}
 
 	/*server.MenuLogin()*/
-	server.ChairMenu()
+	//.ChairMenu()
 	//fmt.Println(server)
 	//product.AddChair(queries)
 	//product.GetChair(queries)
