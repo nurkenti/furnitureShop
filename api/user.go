@@ -11,14 +11,25 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/nurkenti/furnitureShop/db/sqlc"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/nurkenti/furnitureShop/db/util"
 )
 
 type CreateUserRequest struct {
 	Email    string `json:"email" binding:"required,contains=@"`
 	Password string `json:"password" binding:"required,min=6"`
-	FullName string `json:"full_name" binding:"required,min=3,max=20"`
-	Age      int32  `json:"age"`
+	FullName string `json:"full_name" binding:"required,min=3,max=20,alpha"`
+	Age      int32  `json:"age" binding:"required,gte=18,lte=100"`
+}
+
+// Убираем пароль чтобы было безопасно
+type createUserResponse struct {
+	ID        pgtype.UUID       `json:"id"`
+	Email     string            `json:"email"`
+	FullName  string            `json:"full_name"`
+	Age       int32             `json:"age"`
+	Role      sqlc.NullUserRole `json:"role"`
+	CreatedAt pgtype.Timestamp  `json:"created_at"`
+	UpdateAt  pgtype.Timestamp  `json:"update_at"`
 }
 
 func (server *Server) CreateUser(ctx *gin.Context) {
@@ -29,7 +40,7 @@ func (server *Server) CreateUser(ctx *gin.Context) {
 	}
 
 	//Hash pw for security
-	hashedPw, err := hashPassword(req.Password)
+	hashedPw, err := util.HashPassword(req.Password)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -60,16 +71,16 @@ func (server *Server) CreateUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
-	ctx.JSON(http.StatusOK, user)
-}
-
-func hashPassword(pw string) (string, error) {
-	hashPw, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
+	rsp := createUserResponse{
+		ID:        user.ID,
+		FullName:  user.FullName,
+		Email:     user.Email,
+		Age:       user.Age,
+		Role:      user.Role,
+		CreatedAt: user.CreatedAt,
+		UpdateAt:  user.UpdateAt,
 	}
-	return string(hashPw), nil
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 type getUserIDRequest struct {

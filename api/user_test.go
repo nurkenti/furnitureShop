@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -20,6 +21,31 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Все это нужно чтобы тестироватьс хэш паролем
+type eqCreateUserParamsMatcher struct {
+	arg      sqlc.CreateUserParams
+	password string
+}
+
+func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
+	arg, ok := x.(sqlc.CreateUserParams)
+	if !ok {
+		return false
+	}
+
+	err := util.CheckPassword(e.password, arg.PasswordHash)
+	if err != nil {
+		return false
+	}
+
+	e.arg.PasswordHash = arg.PasswordHash
+	return reflect.DeepEqual(e.arg, arg)
+}
+
+func (e eqCreateUserParamsMatcher) String() string {
+	return fmt.Sprintf("mathes arg %v and password %v", e.arg, e.password)
+}
+
 func randomUser() sqlc.User {
 	return sqlc.User{
 		ID:           pgtype.UUID{Bytes: uuid.New(), Valid: true},
@@ -30,8 +56,13 @@ func randomUser() sqlc.User {
 		Role:         sqlc.NullUserRole{UserRole: "admin", Valid: true},
 	}
 }
+
+func EqCreateUserParams(arg sqlc.CreateUserParams, password string) gomock.Matcher {
+	return eqCreateUserParamsMatcher{arg, password}
+}
 func TestCreatUserAPI(t *testing.T) {
 	user := randomUser()
+	password := user.PasswordHash
 	testCase := []struct {
 		name          string
 		body          gin.H //Тела user в формате JSON
@@ -42,12 +73,18 @@ func TestCreatUserAPI(t *testing.T) {
 			name: "OK",
 			body: gin.H{
 				"email":     user.Email,
-				"password":  "secret",
+				"password":  password,
 				"full_name": user.FullName,
 				"age":       user.Age,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
+				// Создаем параметры с хэш паролем
+				arg := sqlc.CreateUserParams{
+					ID:       user.ID,
+					FullName: user.FullName,
+					Email:    user.Email,
+				}
+				store.EXPECT().CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
 					Times(1).
 					Return(user, nil)
 			},
@@ -84,6 +121,63 @@ func TestCreatUserAPI(t *testing.T) {
 				"password":  "secret",
 				"full_name": "Sa",
 				"age":       user.Age,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				// ✅ При коротком запрос НЕ должен доходить до БД
+				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
+					Times(0). // - ноль вызовов
+					Return(user, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "EmptyName",
+			body: gin.H{
+				"email":     user.Email,
+				"password":  "secret",
+				"full_name": "",
+				"age":       user.Age,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				// ✅ При коротком запрос НЕ должен доходить до БД
+				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
+					Times(0). // - ноль вызовов
+					Return(user, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "NumberInName",
+			body: gin.H{
+				"email":     user.Email,
+				"password":  "secret",
+				"full_name": "1231",
+				"age":       user.Age,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				// ✅ При коротком запрос НЕ должен доходить до БД
+				store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
+					Times(0). // - ноль вызовов
+					Return(user, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "AgeMinNumber",
+			body: gin.H{
+				"email":     user.Email,
+				"password":  "secret",
+				"full_name": "1231",
+				"age":       155,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// ✅ При коротком запрос НЕ должен доходить до БД

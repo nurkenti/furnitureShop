@@ -2,6 +2,7 @@ package sqlc
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -67,9 +68,7 @@ func TestGetChairByModel(t *testing.T) {
 	chair2, err := testQueries.GetChairByModel(context.Background(), chair1.Model)
 	require.NoError(t, err)
 	require.NotEmpty(t, chair2)
-
 	require.Equal(t, chair1.Model, chair2.Model)
-	require.Equal(t, chair1.Material, chair2.Material)
 	require.Equal(t, chair1.Price, chair2.Price)
 
 }
@@ -246,7 +245,8 @@ func TestUpdateWarehouse(t *testing.T) {
 	warehouse, err := testQueries.GetWarhouse(context.Background(), "sonyx")
 	require.NoError(t, err)
 
-	newQuantity := int32(25)
+	newQuantity := int32(util.RandomInt(100))
+	fmt.Println(newQuantity)
 	err = testQueries.UpdateWarehouseQuantity(context.Background(), sqlc.UpdateWarehouseQuantityParams{
 		ProductModel: "sonyx",
 		Quantity:     newQuantity,

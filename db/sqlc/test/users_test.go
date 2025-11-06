@@ -14,10 +14,13 @@ import (
 )
 
 func createRandomUser(t *testing.T) sqlc.User {
+	hashedPassword, err := util.HashPassword(util.RandomString(6))
+	require.NoError(t, err)
+
 	arg := sqlc.CreateUserParams{
 		ID:           pgtype.UUID{Bytes: uuid.New(), Valid: true},
 		Email:        util.RandomEmail(),
-		PasswordHash: util.RandomPassword(),
+		PasswordHash: hashedPassword,
 		FullName:     util.RandomName(),
 		Age:          int32(util.RandomAge()),
 		Role:         sqlc.NullUserRole{UserRole: "admin", Valid: true},
