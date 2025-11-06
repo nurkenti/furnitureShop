@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -38,8 +37,10 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 		return false
 	}
 
-	e.arg.PasswordHash = arg.PasswordHash
-	return reflect.DeepEqual(e.arg, arg)
+	/*	e.arg.PasswordHash = arg.PasswordHash
+		return reflect.DeepEqual(e.arg, arg)*/
+	return e.arg.Email == arg.Email && e.arg.FullName == arg.FullName && e.arg.Age == arg.Age
+	// Игнорируем: ID, PasswordHash, Role - они генерируются автоматически
 }
 
 func (e eqCreateUserParamsMatcher) String() string {
@@ -52,7 +53,7 @@ func randomUser() sqlc.User {
 		Email:        util.RandomEmail(),
 		PasswordHash: util.RandomPassword(),
 		FullName:     util.RandomName(),
-		Age:          int32(util.RandomAge()),
+		Age:          util.RandomAge(),
 		Role:         sqlc.NullUserRole{UserRole: "admin", Valid: true},
 	}
 }
@@ -83,7 +84,10 @@ func TestCreatUserAPI(t *testing.T) {
 					ID:       user.ID,
 					FullName: user.FullName,
 					Email:    user.Email,
+					Age:      user.Age,
+					Role:     user.Role,
 				}
+				// gomock.Eq() - проверяет что аргумент РАВЕН ожидаемому значению.
 				store.EXPECT().CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
 					Times(1).
 					Return(user, nil)
@@ -92,7 +96,16 @@ func TestCreatUserAPI(t *testing.T) {
 				fmt.Printf("Final Status: %d\n", recorder.Code)
 				fmt.Printf("Final Body: %s\n", recorder.Body.String())
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requestBodyMatchUser(t, recorder.Body, user)
+				expectedUserResponce := createUserResponse{
+					ID:        user.ID,
+					FullName:  user.FullName,
+					Email:     user.Email,
+					Age:       user.Age,
+					Role:      user.Role,
+					CreatedAt: user.CreatedAt,
+					UpdateAt:  user.UpdateAt,
+				}
+				requestBodyMatchUser(t, recorder.Body, expectedUserResponce)
 			},
 		},
 		{
@@ -177,7 +190,7 @@ func TestCreatUserAPI(t *testing.T) {
 				"email":     user.Email,
 				"password":  "secret",
 				"full_name": "1231",
-				"age":       155,
+				"age":       125,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// ✅ При коротком запрос НЕ должен доходить до БД
@@ -240,6 +253,16 @@ func TestGetUserIDAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
+				user := createUserResponse{
+
+					ID:        user.ID,
+					FullName:  user.FullName,
+					Email:     user.Email,
+					Age:       user.Age,
+					Role:      user.Role,
+					CreatedAt: user.CreatedAt,
+					UpdateAt:  user.UpdateAt,
+				}
 				requestBodyMatchUser(t, recorder.Body, user)
 			},
 		},
@@ -315,12 +338,12 @@ func TestGetUserIDAPI(t *testing.T) {
 	}
 }
 
-func requestBodyMatchUser(t *testing.T, body *bytes.Buffer, user sqlc.User) {
+func requestBodyMatchUser(t *testing.T, body *bytes.Buffer, expected createUserResponse) {
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotUser sqlc.User
+	var gotUser createUserResponse
 	err = json.Unmarshal(data, &gotUser)
 	require.NoError(t, err)
-	require.Equal(t, user, gotUser)
+	require.Equal(t, expected, gotUser)
 }

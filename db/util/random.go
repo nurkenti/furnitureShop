@@ -40,8 +40,8 @@ func RandomName() string {
 	return RandomString(6)
 }
 
-func RandomAge() int {
-	return rand.Intn(99)
+func RandomAge() int32 {
+	return int32(rand.Intn(99) + 5)
 }
 
 func RandomRole() string {
